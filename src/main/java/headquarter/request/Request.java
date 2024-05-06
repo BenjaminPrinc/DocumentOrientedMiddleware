@@ -9,8 +9,13 @@ public class Request {
 
     public Request(RestTemplate restTemplate) {this.restTemplate = restTemplate;}
 
-    public String fetchData() {
+    public String fetchSingleWarehouse() {
         String url = "http://localhost:8080/warehouse/001/data";
+        return restTemplate.getForObject(url, String.class);
+    }
+
+    public String fetchMultipleWarehouses() {
+        String url = "http://localhost:8080/warehouses/data";
         return restTemplate.getForObject(url, String.class);
     }
 }

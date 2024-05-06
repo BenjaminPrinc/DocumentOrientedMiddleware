@@ -32,7 +32,8 @@ public class Application implements CommandLineRunner {
     public void run(String ...args) {
         warehouseRepository.deleteAll();
         productRepository.deleteAll();
-        dataProcessingService.processData(request.fetchData());
+        //dataProcessingService.processSingleData(request.fetchSingleWarehouse());
+        dataProcessingService.processMultipleData(request.fetchMultipleWarehouses());
 
         System.out.println("WarehouseData found with findAll():");
         System.out.println("-------------------------------");

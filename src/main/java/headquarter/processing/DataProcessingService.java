@@ -18,7 +18,7 @@ public class DataProcessingService {
     @Autowired
     private ProductRepository productRepository;
 
-    public void processData(String rawData){
+    public void processSingleData(String rawData){
         try {
             ObjectMapper mapper = new ObjectMapper();
             WarehouseData warehouseRaw = mapper.readValue(rawData, WarehouseData.class);
@@ -35,6 +35,32 @@ public class DataProcessingService {
             ProductData[] productDataArray = warehouseRaw.getProductData();
             List<ProductData> productDataList = Arrays.asList(productDataArray);
             processProducts(productDataList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void processMultipleData(String rawData){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            WarehouseData[] warehousesRaw = mapper.readValue(rawData, WarehouseData[].class);
+            for (WarehouseData wd : warehousesRaw) {
+                WarehouseData warehouse = new WarehouseData(
+                        wd.getWarehouseID(), wd.getWarehouseName(),
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                        wd.getWarehouseAddress(), wd.getWarehousePostalCode(),
+                        wd.getWarehouseCity(), wd.getWarehouseCountry(),
+                        wd.getProductData());
+
+                warehouseRepository.save(warehouse);
+
+                ProductData[] productDataArray = wd.getProductData();
+                List<ProductData> productDataList = Arrays.asList(productDataArray);
+                processProducts(productDataList);
+            }
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
