@@ -10,12 +10,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 @SpringBootApplication
 public class Application implements CommandLineRunner {
     private final Request request;
     private final DataProcessingService dataProcessingService;
     private final WarehouseRepository warehouseRepository;
     private final ProductRepository productRepository;
+    private final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
 
     public Application(Request request, DataProcessingService dataProcessingService, WarehouseRepository warehouseRepository, ProductRepository productRepository) {
         this.request = request;
@@ -54,5 +59,13 @@ public class Application implements CommandLineRunner {
         for (ProductData productData : productRepository.findByWarehouseIDAndProductCategory("001","Backwaren")) {
             System.out.println(productData);
         }
+
+        scheduledExecutorService.scheduleAtFixedRate(()-> {dataProcessingService.processContinuous(request.fetchMultipleWarehouses());
+            System.out.println("Updated warehouses");
+            System.out.println("---------------------------");
+            for(WarehouseData warehouseData : warehouseRepository.findAll()){
+                System.out.println(warehouseData);
+            }
+            System.out.println();}, 0, 10, TimeUnit.SECONDS);
     }
 }
